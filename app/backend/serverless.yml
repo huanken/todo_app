@@ -31,6 +31,7 @@ provider:
             - dynamodb:PutItem
             - dynamodb:GetItem
             - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
           Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
         - Effect: Allow
           Action:
@@ -89,6 +90,7 @@ functions:
           request:
             schemas:
               application/json: ${file(models/create-todo-request.json)}
+
   CreateImage:
     handler: src/lambda/http/createImage.handler
     events:
@@ -96,23 +98,6 @@ functions:
           method: post
           authorizer: Auth
           path: todos/{todoId}/images
-          cors: true
-
-  GetImages:
-    handler: src/lambda/http/getImages.handler
-    events:
-      - http:
-          method: get
-          authorizer: Auth
-          path: todos/{todoId}/images
-          cors: true
-  GetImage:
-    handler: src/lambda/http/getImage.handler
-    events:
-      - http:
-          method: get
-          authorizer: Auth
-          path: images/{imageId}
           cors: true
 
   UpdateTodo:
@@ -126,7 +111,6 @@ functions:
             schemas:
               application/json: ${file(models/update-todo-request.json)}
 
-  # TODO: Configure this function
   DeleteTodo:
     handler: src/lambda/http/deleteTodo.handler
     events:

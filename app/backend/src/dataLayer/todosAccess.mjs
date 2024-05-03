@@ -5,10 +5,12 @@ import AWSXRay from 'aws-xray-sdk-core'
 export class TodoAccess {
   constructor(
     documentClient = AWSXRay.captureAWSv3Client(new DynamoDB()),
-    todosTable = process.env.TODOS_TABLE
+    todosTable = process.env.TODOS_TABLE,
+    imagesTable = process.env.IMAGES_TABLE
   ) {
     this.documentClient = documentClient
     this.todosTable = todosTable
+    this.imagesTable = imagesTable
     this.dynamoDbClient = DynamoDBDocument.from(this.documentClient)
   }
 
@@ -65,5 +67,22 @@ export class TodoAccess {
     }
 
     return todo
+  }
+
+  async deleteTodo(todo) {
+    console.log(`Deleting a todo with id ${todo.todoId}`)
+
+    await this.dynamoDbClient.delete({
+      TableName: this.todosTable,
+      Key: {
+        todoId: todo.todoId,
+      }
+    })
+    await this.dynamoDbClient.delete({
+      TableName: this.imagesTable,
+      Key: {
+        todoId: todo.todoId,
+      }
+    })
   }
 }

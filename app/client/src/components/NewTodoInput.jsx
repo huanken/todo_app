@@ -18,7 +18,8 @@ export function NewTodoInput({ onNewTodo }) {
       const dueDate = calculateDueDate()
       const itemToDo = await createTodo(accessToken, {
         name: newTodoName,
-        dueDate
+        dueDate,
+        createdAt: new Date()
       })
       onNewTodo(itemToDo)
     } catch (e) {

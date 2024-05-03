@@ -16,6 +16,7 @@ export async function createTodo(createTodoRequest, userId) {
     userId: userId,
     name: createTodoRequest.name,
     dueDate: createTodoRequest.dueDate,
+    createdAt: createTodoRequest.createdAt,
     done: false
   })
 }
@@ -25,5 +26,11 @@ export async function updateTodo(updateTodoRequest, todoId) {
     todoId: todoId,
     imageUrl: updateTodoRequest.imageUrl,
     done: updateTodoRequest.done
+  })
+}
+
+export async function deleteTodo(todoId) {
+  return await todoAccess.deleteTodo({
+    todoId: todoId,
   })
 }

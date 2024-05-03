@@ -8,6 +8,9 @@
     },
     "dueDate": {
       "type": "string"
+    },
+    "createdAt": {
+      "type": "string"
     }
   },
   "required": [
