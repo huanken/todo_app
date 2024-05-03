@@ -27,7 +27,7 @@ export async function createTodo(idToken, newTodo) {
       }
     }
   )
-  return response.data.item
+  return response.data.newItem
 }
 
 export async function patchTodo(idToken, todoId, updatedTodo) {
@@ -54,7 +54,7 @@ export async function deleteTodo(idToken, todoId) {
 
 export async function getUploadUrl(idToken, todoId) {
   const response = await Axios.post(
-    `${process.env.REACT_APP_API_ENDPOINT}/todos/${todoId}/attachment`,
+    `${process.env.REACT_APP_API_ENDPOINT}/todos/${todoId}/images`,
     '',
     {
       headers: {
@@ -63,7 +63,7 @@ export async function getUploadUrl(idToken, todoId) {
       }
     }
   )
-  return response.data.uploadUrl
+  return response.data
 }
 
 export async function uploadFile(uploadUrl, file) {

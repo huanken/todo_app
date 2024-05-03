@@ -22,12 +22,47 @@ export class TodoAccess {
   }
 
   async createTodo(todo) {
-    console.log(`Creating a todo with id ${todo.id}`)
+    console.log(`Creating a todo with id ${todo.todoId}`)
 
     await this.dynamoDbClient.put({
       TableName: this.todosTable,
       Item: todo
     })
+
+    return todo
+  }
+
+  async updateTodo(todo) {
+    console.log(`Update image the todo id ${todo.todoId}`)
+
+    if(todo.imageUrl) {
+      await this.dynamoDbClient.update({
+        TableName: this.todosTable,
+        Key: {
+          todoId: todo.todoId,
+        },
+        UpdateExpression: "set imageUrl = :imageUrl",
+        ExpressionAttributeValues: {
+          ":imageUrl": todo.imageUrl,
+        },
+        ReturnValues: "ALL_NEW",
+        Item: todo
+      })
+    }
+    if(todo.done) {
+      await this.dynamoDbClient.update({
+        TableName: this.todosTable,
+        Key: {
+          todoId: todo.todoId,
+        },
+        UpdateExpression: "set done = :done",
+        ExpressionAttributeValues: {
+          ":done": todo.done,
+        },
+        ReturnValues: "NONE",
+        Item: todo
+      })
+    }
 
     return todo
   }

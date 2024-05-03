@@ -2,7 +2,7 @@ import { useAuth0 } from '@auth0/auth0-react'
 import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Button, Form } from 'semantic-ui-react'
-import { getUploadUrl, uploadFile } from '../api/todos-api'
+import { getUploadUrl, uploadFile, patchTodo } from '../api/todos-api'
 
 const UploadState = {
   NoUpload: 'NoUpload',
@@ -46,10 +46,11 @@ export function EditTodo() {
         audience: `https://dev-hm2pq1mf0vak3xhr.us.auth0.com/api/v2/`,
         scope: 'write:todos'
       })
-      const uploadUrl = await getUploadUrl(accessToken, todoId)
-
+      const {uploadUrl, imageUrl} = await getUploadUrl(accessToken, todoId)
+      
       setUploadState(UploadState.UploadingFile)
       await uploadFile(uploadUrl, file)
+      await patchTodo(accessToken, todoId, {imageUrl: imageUrl})
 
       alert('File was uploaded!')
     } catch (e) {

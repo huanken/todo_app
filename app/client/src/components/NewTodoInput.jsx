@@ -5,7 +5,7 @@ import { Divider, Grid, Input } from 'semantic-ui-react'
 import { createTodo } from '../api/todos-api'
 
 export function NewTodoInput({ onNewTodo }) {
-  const [newTodoName, setNewTodoName] = useState('')
+  const [newTodoName, setNewTodoName] = useState()
 
   const { getAccessTokenSilently } = useAuth0()
 
@@ -16,11 +16,11 @@ export function NewTodoInput({ onNewTodo }) {
         scope: 'write:todos'
       })
       const dueDate = calculateDueDate()
-      const createdTodo = await createTodo(accessToken, {
+      const itemToDo = await createTodo(accessToken, {
         name: newTodoName,
         dueDate
       })
-      onNewTodo(createdTodo)
+      onNewTodo(itemToDo)
     } catch (e) {
       console.log('Failed to created a new TODO', e)
       alert('Todo creation failed')

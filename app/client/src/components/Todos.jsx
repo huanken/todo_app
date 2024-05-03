@@ -61,8 +61,8 @@ export function Todos() {
                   <Icon name="delete" />
                 </Button>
               </Grid.Column>
-              {todo.attachmentUrl && (
-                <Image src={todo.attachmentUrl} size="small" wrapped />
+              {todo?.imageUrl && (
+                <Image src={todo?.imageUrl} size="small" wrapped />
               )}
               <Grid.Column width={16}>
                 <Divider />
@@ -94,11 +94,7 @@ export function Todos() {
         audience: `https://dev-hm2pq1mf0vak3xhr.us.auth0.com/api/v2/`,
         scope: 'write:todo'
       })
-      await patchTodo(accessToken, todo.todoId, {
-        name: todo.name,
-        dueDate: todo.dueDate,
-        done: !todo.done
-      })
+      await patchTodo(accessToken, todo.todoId, {done: !todo.done})
       setTodos(
         update(todos, {
           [pos]: { done: { $set: !todo.done } }
@@ -106,7 +102,7 @@ export function Todos() {
       )
     } catch (e) {
       console.log('Failed to check a TODO', e)
-      alert('Todo deletion failed')
+      alert('Todo update failed')
     }
   }
 
@@ -131,7 +127,6 @@ export function Todos() {
           audience: `https://dev-hm2pq1mf0vak3xhr.us.auth0.com/api/v2/`,
           scope: 'read:todos'
         })
-        console.log('Access token: ' + accessToken)
         const todos = await getTodos(accessToken)
         setTodos(todos)
         setLoadingTodos(false)
@@ -144,7 +139,7 @@ export function Todos() {
 
   return (
     <div>
-      <Header as="h1">TODOs</Header>
+      <Header as="h1">{`Todos list of ${user.name ? user.name : user.email}`}</Header>
 
       <NewTodoInput onNewTodo={(newTodo) => setTodos([...todos, newTodo])} />
 

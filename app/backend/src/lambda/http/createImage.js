@@ -17,6 +17,7 @@ const urlExpiration = parseInt(process.env.SIGNED_URL_EXPIRATION)
 export async function handler(event) {
   console.log('Caller event', event)
   const todoId = event.pathParameters.todoId
+
   const validTodoId = await todoExists(todoId)
 
   if (!validTodoId) {
@@ -43,7 +44,8 @@ export async function handler(event) {
     },
     body: JSON.stringify({
       newItem: newItem,
-      uploadUrl: url
+      uploadUrl: url, 
+      imageUrl: newItem.imageUrl
     })
   }
 }
@@ -52,7 +54,7 @@ async function todoExists(todoId) {
   const result = await dynamoDbClient.get({
     TableName: todosTable,
     Key: {
-      id: todoId
+      todoId: todoId
     }
   })
 

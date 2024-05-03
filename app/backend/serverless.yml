@@ -30,6 +30,7 @@ provider:
             - dynamodb:Scan
             - dynamodb:PutItem
             - dynamodb:GetItem
+            - dynamodb:UpdateItem
           Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
         - Effect: Allow
           Action:
@@ -96,9 +97,7 @@ functions:
           authorizer: Auth
           path: todos/{todoId}/images
           cors: true
-          request:
-            schemas:
-              application/json: ${file(models/create-image-request.json)}
+
   GetImages:
     handler: src/lambda/http/getImages.handler
     events:
@@ -116,7 +115,6 @@ functions:
           path: images/{imageId}
           cors: true
 
-  # TODO: Configure this function
   UpdateTodo:
     handler: src/lambda/http/updateTodo.handler
     events:
@@ -124,6 +122,9 @@ functions:
           method: patch
           path: todos/{todoId}
           cors: true
+          request:
+            schemas:
+              application/json: ${file(models/update-todo-request.json)}
 
   # TODO: Configure this function
   DeleteTodo:
@@ -151,10 +152,10 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
-          - AttributeName: id
+          - AttributeName: todoId
             AttributeType: S
         KeySchema:
-          - AttributeName: id
+          - AttributeName: todoId
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.environment.TODOS_TABLE}

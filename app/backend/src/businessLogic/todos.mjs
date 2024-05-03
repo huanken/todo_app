@@ -9,12 +9,21 @@ export async function getAllTodos() {
 }
 
 export async function createTodo(createTodoRequest, userId) {
-  const itemId = uuid.v4()
+  const todoId = uuid.v4()
 
   return await todoAccess.createTodo({
-    id: itemId,
+    todoId: todoId,
     userId: userId,
     name: createTodoRequest.name,
-    dueDate: createTodoRequest.dueDate
+    dueDate: createTodoRequest.dueDate,
+    done: false
+  })
+}
+
+export async function updateTodo(updateTodoRequest, todoId) {
+  return await todoAccess.updateTodo({
+    todoId: todoId,
+    imageUrl: updateTodoRequest.imageUrl,
+    done: updateTodoRequest.done
   })
 }
