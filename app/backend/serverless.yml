@@ -19,6 +19,7 @@ provider:
     TODOS_TABLE: Todos-${self:provider.stage}
     IMAGES_TABLE: Images-${self:provider.stage}
     IMAGE_ID_INDEX: ImageIdIndex
+    TODOS_CREATED_AT_INDEX: CreatedAtIndex
     IMAGES_S3_BUCKET: udagram-huanken-images-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
   
@@ -27,6 +28,7 @@ provider:
       statements:
         - Effect: Allow
           Action:
+            - dynamodb:Query
             - dynamodb:Scan
             - dynamodb:PutItem
             - dynamodb:GetItem
@@ -37,11 +39,16 @@ provider:
           Action:
             - dynamodb:Query
             - dynamodb:PutItem
+            - dynamodb:DeleteItem
           Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.IMAGES_TABLE}
         - Effect: Allow
           Action:
             - dynamodb:Query
           Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.IMAGES_TABLE}/index/${self:provider.environment.IMAGE_ID_INDEX}
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+          Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_CREATED_AT_INDEX}
         - Effect: Allow
           Action:
             - s3:PutObject
@@ -70,8 +77,13 @@ functions:
     iamRoleStatements:
       - Effect: Allow
         Action:
+          - dynamodb:Query
           - dynamodb:Scan
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_CREATED_AT_INDEX}
       - Effect: "Allow"
         Action:
           - "xray:PutTraceSegments"
@@ -136,13 +148,28 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
           - AttributeName: todoId
             AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
         KeySchema:
-          - AttributeName: todoId
+          - AttributeName: userId
             KeyType: HASH
+          - AttributeName: todoId
+            KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.environment.TODOS_TABLE}
+        LocalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.TODOS_CREATED_AT_INDEX}
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
 
     ImagesDynamoDBTable:
       Type: "AWS::DynamoDB::Table"

@@ -1,6 +1,6 @@
 import jsonwebtoken from 'jsonwebtoken'
 import { createLogger } from '../utils/logger.mjs'
-
+const logger = createLogger('auth')
 const certificate = `-----BEGIN CERTIFICATE-----
 MIIDHTCCAgWgAwIBAgIJbJHjUQK+X6kYMA0GCSqGSIb3DQEBCwUAMCwxKjAoBgNV
 BAMTIWRldi1obTJwcTFtZjB2YWszeGhyLnVzLmF1dGgwLmNvbTAeFw0yNDA1MDIx
@@ -24,7 +24,9 @@ rIwJsz6hiTyHeEv5h/EzrxN0llYHjmRKg+tz3V2ktfsR79dwr910xjp5PSCz4fWE
 export async function handler(event) {
   try {
     const jwtToken = verifyToken(event.authorizationToken)
-    console.log('User was authorized', jwtToken)
+    logger.info('User was authorized', {
+      jwtToken: jwtToken
+    })
 
     return {
       principalId: 'user',
@@ -40,8 +42,9 @@ export async function handler(event) {
       }
     }
   } catch (e) {
-    console.log('User was not authorized', e.message)
-
+    logger.info('User was not authorized', {
+      message: e.message
+    })
     return {
       principalId: 'user',
       policyDocument: {

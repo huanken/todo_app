@@ -2,6 +2,7 @@ import { DynamoDB } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb'
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { getUserId } from '../utils/utils.mjs'
 import AWSXRay from 'aws-xray-sdk-core'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -17,8 +18,10 @@ const urlExpiration = parseInt(process.env.SIGNED_URL_EXPIRATION)
 export async function handler(event) {
   console.log('Caller event', event)
   const todoId = event.pathParameters.todoId
+  const authorization = event.headers.Authorization
+  const userId = getUserId(authorization)
 
-  const validTodoId = await todoExists(todoId)
+  const validTodoId = await todoExists(todoId, userId)
 
   if (!validTodoId) {
     return {
@@ -50,11 +53,12 @@ export async function handler(event) {
   }
 }
 
-async function todoExists(todoId) {
+async function todoExists(todoId, userId) {
   const result = await dynamoDbClient.get({
     TableName: todosTable,
     Key: {
-      todoId: todoId
+      todoId: todoId,
+      userId: userId
     }
   })
 

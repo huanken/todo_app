@@ -4,8 +4,8 @@ import { TodoAccess } from '../dataLayer/todosAccess.mjs'
 
 const todoAccess = new TodoAccess()
 
-export async function getAllTodos() {
-  return todoAccess.getAllTodos()
+export async function getAllTodos(userId) {
+  return todoAccess.getAllTodos(userId)
 }
 
 export async function createTodo(createTodoRequest, userId) {
@@ -21,16 +21,18 @@ export async function createTodo(createTodoRequest, userId) {
   })
 }
 
-export async function updateTodo(updateTodoRequest, todoId) {
+export async function updateTodo(updateTodoRequest, todoId, userId) {
   return await todoAccess.updateTodo({
     todoId: todoId,
+    userId: userId,
     imageUrl: updateTodoRequest.imageUrl,
     done: updateTodoRequest.done
   })
 }
 
-export async function deleteTodo(todoId) {
+export async function deleteTodo(todoId, userId) {
   return await todoAccess.deleteTodo({
+    userId: userId,
     todoId: todoId,
   })
 }
