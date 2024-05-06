@@ -5,6 +5,8 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { getUserId } from '../utils/utils.mjs'
 import AWSXRay from 'aws-xray-sdk-core'
 import { v4 as uuidv4 } from 'uuid'
+import { createLogger } from '../utils/logger.mjs'
+const logger = createLogger('todos')
 
 const dynamoDb = AWSXRay.captureAWSv3Client(new DynamoDB())
 const dynamoDbClient = DynamoDBDocument.from(dynamoDb)
@@ -63,6 +65,8 @@ async function todoExists(todoId, userId) {
   })
 
   console.log('Get todo: ', result)
+  logger.info('Get todo: ', result)
+
   return !!result.Item
 }
 
@@ -78,6 +82,7 @@ async function createImage(todoId, imageId, event) {
     ...newImage
   }
   console.log('Storing new item: ', newItem)
+  logger.info('Storing new item: ', newItem)
 
   await dynamoDbClient.put({
     TableName: imagesTable,

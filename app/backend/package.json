@@ -24,6 +24,9 @@
     "jsonwebtoken": "^8.5.1",
     "serverless-iam-roles-per-function": "^3.2.0",
     "uuid": "^9.0.0",
-    "winston": "^3.8.2"
+    "winston": "^3.8.2",
+    "@aws-sdk/credential-provider-node": "^3.238.0",
+    "@opensearch-project/opensearch": "^2.1.0",
+    "aws-opensearch-connector": "^1.1.0"
   }
 }

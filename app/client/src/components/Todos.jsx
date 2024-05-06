@@ -141,7 +141,7 @@ export function Todos() {
     <div>
       <Header as="h1">{`Todos list of ${user.name ? user.name : user.email}`}</Header>
 
-      <NewTodoInput onNewTodo={(newTodo) => setTodos([...todos, newTodo])} />
+      <NewTodoInput onNewTodo={(newTodo) => setTodos([newTodo, ...todos])} />
 
       {renderTodos(loadingTodos, todos)}
     </div>

@@ -29,7 +29,8 @@ export class TodoAccess {
         KeyConditionExpression: 'userId = :userId',
         ExpressionAttributeValues: {
           ':userId': userId
-        }
+        },
+        ScanIndexForward: false,
       })
     return result.Items
   }
@@ -93,16 +94,6 @@ export class TodoAccess {
       Key: {
         todoId: todo.todoId,
         userId: todo.userId,
-      }
-    })
-    await this.dynamoDbClient.delete({
-      TableName: this.imagesTable,
-      Key: {
-        todoId: todo.todoId
-      },
-      ConditionExpression: 'todoId = :todoId',
-      ExpressionAttributeValues: {
-        ':todoId': todo.todoId
       }
     })
   }
