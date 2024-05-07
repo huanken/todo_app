@@ -19,11 +19,11 @@ const urlExpiration = parseInt(process.env.SIGNED_URL_EXPIRATION)
 
 export async function handler(event) {
   console.log('Caller event', event)
-  const todoId = event.pathParameters.todoId
+  const todoIds = event.pathParameters.todoId
   const authorization = event.headers.Authorization
   const userId = getUserId(authorization)
 
-  const validTodoId = await todoExists(todoId, userId)
+  const validTodoId = await todoExists(todoIds, userId)
 
   if (!validTodoId) {
     return {
@@ -38,7 +38,7 @@ export async function handler(event) {
   }
 
   const imageId = uuidv4()
-  const newItem = await createImage(todoId, imageId, event)
+  const newItem = await createImage(userId, todoIds, imageId, event)
 
   const url = await getUploadUrl(imageId)
 
@@ -70,12 +70,13 @@ async function todoExists(todoId, userId) {
   return !!result.Item
 }
 
-async function createImage(todoId, imageId, event) {
+async function createImage(userId, todoIds, imageId, event) {
   const timestamp = new Date().toISOString()
   const newImage = JSON.parse(event.body)
 
   const newItem = {
-    todoId,
+    userId,
+    todoIds,
     timestamp,
     imageId,
     imageUrl: `https://${bucketName}.s3.amazonaws.com/${imageId}`,

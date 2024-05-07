@@ -29,7 +29,6 @@ provider:
         - Effect: Allow
           Action:
             - dynamodb:Query
-            - dynamodb:Scan
             - dynamodb:PutItem
             - dynamodb:GetItem
             - dynamodb:UpdateItem
@@ -184,16 +183,16 @@ resources:
       Type: "AWS::DynamoDB::Table"
       Properties:
         AttributeDefinitions:
-          - AttributeName: todoId
+          - AttributeName: userId
             AttributeType: S
-          - AttributeName: timestamp
+          - AttributeName: todoIds
             AttributeType: S
           - AttributeName: imageId
             AttributeType: S
         KeySchema:
-          - AttributeName: todoId
+          - AttributeName: userId
             KeyType: HASH
-          - AttributeName: timestamp
+          - AttributeName: todoIds
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         StreamSpecification:
