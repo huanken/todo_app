@@ -22,43 +22,6 @@ provider:
     TODOS_CREATED_AT_INDEX: CreatedAtIndex
     IMAGES_S3_BUCKET: udagram-huanken-images-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
-  
-  iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action:
-            - dynamodb:Query
-            - dynamodb:PutItem
-            - dynamodb:GetItem
-            - dynamodb:UpdateItem
-            - dynamodb:DeleteItem
-          Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-        - Effect: Allow
-          Action:
-            - dynamodb:Query
-            - dynamodb:PutItem
-            - dynamodb:DeleteItem
-          Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.IMAGES_TABLE}
-        - Effect: Allow
-          Action:
-            - dynamodb:Query
-          Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.IMAGES_TABLE}/index/${self:provider.environment.IMAGE_ID_INDEX}
-        - Effect: Allow
-          Action:
-            - dynamodb:Query
-          Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_CREATED_AT_INDEX}
-        - Effect: Allow
-          Action:
-            - s3:PutObject
-            - s3:GetObject
-          Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
-        - Effect: "Allow"
-          Action:
-            - "xray:PutTraceSegments"
-            - "xray:PutTelemetryRecords"
-          Resource:
-            - "*"
 
 functions:
 
@@ -78,11 +41,16 @@ functions:
         Action:
           - dynamodb:Query
           - dynamodb:Scan
+          - dynamodb:GetItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
       - Effect: Allow
         Action:
           - dynamodb:Query
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_CREATED_AT_INDEX}
+      - Effect: Allow
+        Action:
+          - s3:GetObject
+        Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
       - Effect: "Allow"
         Action:
           - "xray:PutTraceSegments"
@@ -101,6 +69,11 @@ functions:
           request:
             schemas:
               application/json: ${file(models/create-todo-request.json)}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   CreateImage:
     handler: src/lambda/http/createImage.handler
@@ -110,6 +83,19 @@ functions:
           authorizer: Auth
           path: todos/{todoId}/images
           cors: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.IMAGES_TABLE}
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+        Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
 
   UpdateTodo:
     handler: src/lambda/http/updateTodo.handler
@@ -121,6 +107,11 @@ functions:
           request:
             schemas:
               application/json: ${file(models/update-todo-request.json)}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   DeleteTodo:
     handler: src/lambda/http/deleteTodo.handler
@@ -129,6 +120,11 @@ functions:
           method: delete
           path: todos/{todoId}
           cors: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:DeleteItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   SyncWithOpenSearch:
     environment:
